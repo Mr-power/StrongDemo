@@ -22,14 +22,13 @@ public class serviceIpConfig {
         DEFAULT_METHODS = Collections.unmodifiableList(serviceIpAllList);
     }
 
-    public static final List<String> DEFAULT_IP ;
+    public static final List<String> DEFAULT_IP=new ArrayList<String >()  ;
     static {
-        //IP集合
-        List<String > IpAllList = new ArrayList<String >(4);
-        IpAllList.add("123.111.111.111");
-        IpAllList.add("123.111.111.111");
-        IpAllList.add("123.111.111.111");
-        IpAllList.add("123.111.111.111");
-        DEFAULT_IP = Collections.unmodifiableList(IpAllList);
+
+        DEFAULT_IP.add("192.168.1.154");
+        DEFAULT_IP.add("123.111.111.111");
+        DEFAULT_IP.add("123.111.111.121");
+        DEFAULT_IP.add("123.111.111.131");
+
     }
 }
