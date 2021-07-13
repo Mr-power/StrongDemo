@@ -24,11 +24,9 @@ public class serviceIpConfig {
 
     public static final List<String> DEFAULT_IP=new ArrayList<String >()  ;
     static {
-
         DEFAULT_IP.add("192.168.1.154");
         DEFAULT_IP.add("123.111.111.111");
         DEFAULT_IP.add("123.111.111.121");
         DEFAULT_IP.add("123.111.111.131");
-
     }
 }

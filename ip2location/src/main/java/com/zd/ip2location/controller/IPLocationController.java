@@ -15,6 +15,7 @@ import io.swagger.annotations.ApiOperation;
 import io.swagger.models.auth.In;
 import org.gavaghan.geodesy.GlobalCoordinates;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.transaction.support.ResourceHolderSupport;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.client.RestTemplate;
 
@@ -44,8 +45,9 @@ public class IPLocationController {
     @ApiOperation(value = "ip获取 地理位置", notes = "ip获取地理位置")
     @RequestMapping(value = "/ipoLocation",method = RequestMethod.POST)
     @ResponseBody
-    public IPLocation getIPLocation(@RequestBody String ip){
-        return ipLocationService.getIPLocation(ip);
+    public Result getIPLocation(@RequestBody String ip){
+
+        return ResultUtil.success(ipLocationService.getIPLocation(ip));
     }
 
     @ApiOperation(value = "ip运维员控制故障ip", notes = "ip运维员控制故障ip")
@@ -75,26 +77,13 @@ public class IPLocationController {
          *
          */
         IPLocation Location=ipLocationService.getIPLocation(ip);
-        //GlobalCoordinates CurCoordinates=ipoService.getCoordinates(Location);
+        GlobalCoordinates CurCoordinates=ipoService.getCoordinates(Location);
         // 服务器 延迟 估算 map
-        HashMap<Integer,Integer> delay=new HashMap<>();
-      //     String realIp=ipoService.getRealIp();
-      //     //初始TTL的值 简单点，直接设置255的话，会导致距离因素影响巨小。
-      //     int oriTTL;
-      //     String os = System.getProperty("os.name");
-      //     if(KindsOs.UNIX.getMsg().equals(os)){
-      //         oriTTL=KindsOs.UNIX.getTtl();
-      //     }
-      //     else oriTTL=KindsOs.LINUX.getTtl();
-
-      //     //当前TTL的值
-      //     int TTL=oriTTL-ipoService.getTTL();
-        //100千米 对应 1ms 距离+TTL = delay
-        //直达坐标
-        List<Double> distance = ipoService.getDistance(new GlobalCoordinates(31.21345,121.568812), serviceIpConfig.DEFAULT_METHODS);
+        HashMap<Integer,Double> delay=new HashMap<>();
+        List<Double> distance = ipoService.getDistance(CurCoordinates, serviceIpConfig.DEFAULT_METHODS);
         int index=1;
         for(Double l1 : distance){
-            delay.put(index++,l1.intValue()/100000);
+            delay.put(index++,l1);
         }
         int key =ipoService.getserverIp(delay);
         if(key==-1){

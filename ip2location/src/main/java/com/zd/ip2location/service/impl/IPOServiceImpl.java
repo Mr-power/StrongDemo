@@ -1,6 +1,7 @@
 package com.zd.ip2location.service.impl;
 
 import com.zd.ip2location.bean.LatAndLongitude;
+import com.zd.ip2location.pojo.IPLocation;
 import com.zd.ip2location.service.IPOService;
 import org.gavaghan.geodesy.Ellipsoid;
 import org.gavaghan.geodesy.GeodeticCalculator;
@@ -64,13 +65,23 @@ public class IPOServiceImpl implements IPOService {
     }
 
     @Override
-    public Integer getserverIp(HashMap<Integer,Integer> map) {
+    public Integer getserverIp(HashMap<Integer,Double> map) {
         if(map==null){
             return -1;
         }
-        List<Map.Entry<Integer, Integer>> list = new ArrayList(map.entrySet());
-        list.sort(Comparator.comparingInt(Map.Entry::getValue));
+        List<Map.Entry<Integer, Double>> list = new ArrayList(map.entrySet());
+        list.sort(Comparator.comparingDouble(Map.Entry::getValue));
         return list.get(0).getKey();
+    }
+
+    @Override
+    public GlobalCoordinates getCoordinates(IPLocation Location) {
+
+
+
+
+
+        return null;
     }
 
     public static double getDistanceMeter(GlobalCoordinates gpsFrom, GlobalCoordinates gpsTo, Ellipsoid ellipsoid){

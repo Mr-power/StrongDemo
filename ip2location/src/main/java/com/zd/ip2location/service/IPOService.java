@@ -1,6 +1,7 @@
 package com.zd.ip2location.service;
 
 import com.zd.ip2location.bean.LatAndLongitude;
+import com.zd.ip2location.pojo.IPLocation;
 import org.gavaghan.geodesy.GlobalCoordinates;
 
 import java.io.IOException;
@@ -13,5 +14,6 @@ public interface IPOService {
     Integer getTTL() throws  IOException;
     List<Double> getDistance(GlobalCoordinates curLocation, List<GlobalCoordinates > list);
     Double getCurDistance(GlobalCoordinates curLocation, GlobalCoordinates serLocation);
-    Integer getserverIp(HashMap<Integer, Integer> map);
+    Integer getserverIp(HashMap<Integer, Double> map);
+    GlobalCoordinates getCoordinates(IPLocation Location);
 }
