@@ -29,4 +29,6 @@ public class serviceIpConfig {
         DEFAULT_IP.add("123.111.111.121");
         DEFAULT_IP.add("123.111.111.131");
     }
+
+    //public static final HashMap<>
 }

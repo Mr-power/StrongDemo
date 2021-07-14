@@ -13,7 +13,6 @@ public interface IPOService {
     String getRealIp();
     Integer getTTL() throws  IOException;
     List<Double> getDistance(GlobalCoordinates curLocation, List<GlobalCoordinates > list);
-    Double getCurDistance(GlobalCoordinates curLocation, GlobalCoordinates serLocation);
     Integer getserverIp(HashMap<Integer, Double> map);
-    GlobalCoordinates getCoordinates(IPLocation Location);
+
 }
