@@ -37,9 +37,8 @@ public class IPLocationController {
         String ServerCode;
         String[] ServerPriority;
         String CanUse;
-        if(curLocationMessage.getCountryCode().equals("CN")) {
+        if(curLocationMessage.getCountryCode().equals("CN")||curLocationMessage.getCountryCode().equals("HK")||curLocationMessage.getCountryCode().equals("MO")) {
              ServerCode = ipoService.getWhichOneServer(curLocationMessage.getRegionName());
-
              ServerPriority = ServerCode.split(",");
             //判断哪台服务器能用。
              CanUse = ipoService.oneCanUse(ServerPriority);
