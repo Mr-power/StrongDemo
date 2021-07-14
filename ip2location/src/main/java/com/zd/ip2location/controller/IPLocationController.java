@@ -1,32 +1,21 @@
 package com.zd.ip2location.controller;
 
-import com.zd.ip2location.bean.LatAndLongitude;
-import com.zd.ip2location.bean.OsName;
+
 import com.zd.ip2location.bean.Result;
-import com.zd.ip2location.config.KindsOs;
-import com.zd.ip2location.config.ResultEnum;
+import com.zd.ip2location.config.ServerCode;
 import com.zd.ip2location.config.serviceIpConfig;
 import com.zd.ip2location.pojo.IPLocation;
 import com.zd.ip2location.service.IPLocationService;
 import com.zd.ip2location.service.impl.IPOServiceImpl;
 import com.zd.ip2location.util.ResultUtil;
-import com.zd.ip2location.util.SocketUtils;
 import io.swagger.annotations.ApiOperation;
-import io.swagger.models.auth.In;
-import org.gavaghan.geodesy.GlobalCoordinates;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.transaction.support.ResourceHolderSupport;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.client.RestTemplate;
 
 import javax.annotation.Resource;
-import javax.servlet.http.HttpServlet;
-import javax.servlet.http.HttpServletRequest;
 import java.io.IOException;
-import java.net.*;
-import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.List;
 
 @RestController
 public class IPLocationController {
@@ -40,7 +29,28 @@ public class IPLocationController {
     @Resource
     private RestTemplate restTemplate;
 
+    @ApiOperation(value = "选择最优服务器", notes = "选择最优服务器")
+    @RequestMapping(value = "/getWhichOne",method = RequestMethod.POST)
+    @ResponseBody
+    public Result getWhichOne(@RequestBody String ip) throws IOException {
+        IPLocation curLocationMessage=ipLocationService.getIPLocation(ip);
+        String ServerCode;
+        String[] ServerPriority;
+        String CanUse;
+        if(curLocationMessage.getCountryCode().equals("CN")) {
+             ServerCode = ipoService.getWhichOneServer(curLocationMessage.getRegionName());
 
+             ServerPriority = ServerCode.split(",");
+            //判断哪台服务器能用。
+             CanUse = ipoService.oneCanUse(ServerPriority);
+             return ResultUtil.success(CanUse);
+        }
+        ServerCode = ipoService.getWhichOneServer(curLocationMessage.getCountryCode());
+        ServerPriority = ServerCode.split(",");
+        //判断哪台服务器能用。
+        CanUse = ipoService.oneCanUse(ServerPriority);
+        return ResultUtil.success(CanUse);
+    }
 
     @ApiOperation(value = "ip获取 地理位置", notes = "ip获取地理位置")
     @RequestMapping(value = "/ipoLocation",method = RequestMethod.POST)
@@ -50,22 +60,28 @@ public class IPLocationController {
         return ResultUtil.success(ipLocationService.getIPLocation(ip));
     }
 
-    @ApiOperation(value = "ip运维员控制故障ip", notes = "ip运维员控制故障ip")
+    @ApiOperation(value = "ip运维员控制故障ip——Code", notes = "ip运维员控制故障ip——Code【如HK，BJ...】")
     @RequestMapping(value = "/selectRemoveIp",method = RequestMethod.POST)
     @ResponseBody
     public Result selectRemoveIp (@RequestBody String RemoveIp) {
-        serviceIpConfig.DEFAULT_IP.remove(RemoveIp);
+        serviceIpConfig.IP_Map.remove(RemoveIp);
         return ResultUtil.success();
     }
 
-    @ApiOperation(value = "ip运维员控制故障ip恢复", notes = "ip运维员控制故障ip恢复")
+    @ApiOperation(value = "ip运维员控制故障ip恢复[code,IP][HK,111.11.11.11]", notes = "ip运维员控制故障ip恢复[code,IP][HK,111.11.11.11]")
     @RequestMapping(value = "/selectIp",method = RequestMethod.POST)
     @ResponseBody
     public Result selectResetIp (@RequestBody String ResetIp) {
-        if(serviceIpConfig.DEFAULT_IP.contains(ResetIp)){
-            return ResultUtil.error(403,"无需恢复，服务器已经存在");
+        String [] insertIp=ResetIp.split(",");
+        try {
+            Enum.valueOf(ServerCode.class, insertIp[0]);
+        }catch (IllegalArgumentException e){
+            return ResultUtil.error(403,"区域代码输入错误");
         }
-        serviceIpConfig.DEFAULT_IP.add(ResetIp);
+        if(serviceIpConfig.IP_Map.containsKey(insertIp[0])){
+            return ResultUtil.error(403,"无需恢复，该区域服务器已经存在");
+        }
+        serviceIpConfig.IP_Map.put(insertIp[0],insertIp[1]);
         return ResultUtil.success();
     }
 
@@ -77,19 +93,19 @@ public class IPLocationController {
          *
          */
         IPLocation Location=ipLocationService.getIPLocation(ip);
-        GlobalCoordinates CurCoordinates=ipoService.getCoordinates(Location);
+        //GlobalCoordinates CurCoordinates=ipoService.getCoordinates(Location);
         // 服务器 延迟 估算 map
         HashMap<Integer,Double> delay=new HashMap<>();
-        List<Double> distance = ipoService.getDistance(CurCoordinates, serviceIpConfig.DEFAULT_METHODS);
-        int index=1;
-        for(Double l1 : distance){
-            delay.put(index++,l1);
-        }
-        int key =ipoService.getserverIp(delay);
-        if(key==-1){
-            return ResultUtil.error(404,"无服务器可用");
-        }
-       // String BestIp= delay.get(key);
+        //List<Double> distance = ipoService.getDistance(CurCoordinates, serviceIpConfig.DEFAULT_METHODS);
+    //      int index=1;
+    //      for(Double l1 : distance){
+    //          delay.put(index++,l1);
+    //      }
+    //      int key =ipoService.getserverIp(delay);
+    //      if(key==-1){
+    //          return ResultUtil.error(404,"无服务器可用");
+    //      }
+    //     // String BestIp= delay.get(key);
         return ResultUtil.success();
     }
 

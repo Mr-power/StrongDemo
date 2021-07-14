@@ -4,9 +4,7 @@ import com.zd.ip2location.bean.LatAndLongitude;
 import org.gavaghan.geodesy.GlobalCoordinates;
 import org.springframework.stereotype.Component;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
+import java.util.*;
 
 @Component
 public class serviceIpConfig {
@@ -30,5 +28,11 @@ public class serviceIpConfig {
         DEFAULT_IP.add("123.111.111.131");
     }
 
-    //public static final HashMap<>
+    public static final Map<String,String> IP_Map=new HashMap<>() ;
+    static {
+        IP_Map.put("BJ","11.11.11.001");
+        IP_Map.put("SH","11.11.11.002");
+        IP_Map.put("HK","11.11.11.003");
+        IP_Map.put("SG","11.11.11.004");
+    }
 }

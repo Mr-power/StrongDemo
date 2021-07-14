@@ -2,12 +2,15 @@ package com.zd.ip2location.service.impl;
 
 import com.baomidou.mybatisplus.core.toolkit.StringUtils;
 import com.zd.ip2location.bean.LatAndLongitude;
+import com.zd.ip2location.config.ClientLocationConfig;
+import com.zd.ip2location.config.serviceIpConfig;
 import com.zd.ip2location.pojo.IPLocation;
 import com.zd.ip2location.service.IPOService;
 import org.gavaghan.geodesy.Ellipsoid;
 import org.gavaghan.geodesy.GeodeticCalculator;
 import org.gavaghan.geodesy.GeodeticCurve;
 import org.gavaghan.geodesy.GlobalCoordinates;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.context.request.RequestContextHolder;
@@ -30,9 +33,13 @@ public class IPOServiceImpl implements IPOService {
     @Resource
     private RestTemplate restTemplate;
 
+
     public final static double Ea = 6378137;     //   赤道半径
 
     public final static double Eb = 6356725;     //   极半径
+
+    @Autowired
+    private ClientLocationConfig clientLocationConfigl;
 
     @Override
     public String getRealIp() {
@@ -71,6 +78,28 @@ public class IPOServiceImpl implements IPOService {
         List<Map.Entry<Integer, Double>> list = new ArrayList(map.entrySet());
         list.sort(Comparator.comparingDouble(Map.Entry::getValue));
         return list.get(0).getKey();
+    }
+
+    @Override
+    public String getWhichOneServer(String region) {
+        //先设置个默认的排序
+        if(!clientLocationConfigl.getMap().containsKey(region)) {
+            return "SG,HK,SH,BJ";
+        }
+            return  clientLocationConfigl.getMap().get(region);
+
+
+    }
+
+    @Override
+    public String oneCanUse(String[] ipCode) {
+        for(String l1: ipCode) {
+            if(serviceIpConfig.IP_Map.containsKey(l1)){
+                return serviceIpConfig.IP_Map.get(l1);
+            }
+        }
+        //没服务器可用时候
+        return null;
     }
 
 

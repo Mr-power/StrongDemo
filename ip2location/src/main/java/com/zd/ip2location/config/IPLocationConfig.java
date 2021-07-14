@@ -18,7 +18,7 @@ public class IPLocationConfig {
     @Resource
     private IPLocationMapper ipLocationMapper;
 
-    private static final int IP_DATA_SIZE = 1048575;   // ip_location 表共 1048575 条记录
+    private    static final int IP_DATA_SIZE = 1048575;   // ip_location 表共 1048575 条记录
 
     public static List<IPLocation> ipLocationList = new ArrayList<>(IP_DATA_SIZE);
 

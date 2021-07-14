@@ -14,5 +14,6 @@ public interface IPOService {
     Integer getTTL() throws  IOException;
     List<Double> getDistance(GlobalCoordinates curLocation, List<GlobalCoordinates > list);
     Integer getserverIp(HashMap<Integer, Double> map);
-
+    String getWhichOneServer(String region);
+    String oneCanUse(String[] ipCode);
 }
